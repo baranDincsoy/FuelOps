@@ -1,31 +1,59 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Platform, StatusBar } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import HomeScreen from './screens/HomeScreen';
 import DensityScreen from './screens/DensityScreen';
 import ConverterScreen from './screens/ConverterScreen';
+import CustomDrawer from './components/CustomDrawer';
+import AppHeader from './components/AppHeader';
+import CompressibilityScreen from './screens/CompressibilityScreen';
+import MeterCalibrationScreen from './screens/MeterCalibrationScreen';
 
-const Tab = createBottomTabNavigator();
+const MENU = [
+  { key: 'Compress',  label: 'Compressibility', icon: '📊', title: 'Compressibility Factor' },
+  { key: 'Density',   label: 'API Gravity',     icon: '⛽', title: 'API Gravity' },
+  { key: 'Meter',     label: 'Meter Factor',    icon: '📐', title: 'Meter Calibration' },
+  { key: 'Converter', label: 'Unit Converter',  icon: '🔄', title: 'Unit Converter' },
+];
 
 export default function App() {
+const [activeScreen, setActiveScreen] = useState('Compress');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const current = MENU.find(m => m.key === activeScreen);
+
+  function renderScreen() {
+    switch (activeScreen) {
+      case 'Home':      return <HomeScreen />;
+      case 'Density':   return <DensityScreen />;
+      case 'Compress':  return <CompressibilityScreen />;
+      case 'Converter': return <ConverterScreen />;
+      case 'Meter':     return <MeterCalibrationScreen />;
+      default:          return <HomeScreen />;
+    }
+  }
+
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={{
-          headerStyle: { backgroundColor: '#1a3a5c' },
-          headerTintColor: '#fff',
-          headerTitleStyle: { fontWeight: 'bold' },
-          tabBarStyle: { backgroundColor: '#1a3a5c' },
-          tabBarActiveTintColor: '#a0c4e8',
-          tabBarInactiveTintColor: '#ffffff',
-        }}
-      >
-        <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'Home', tabBarIcon: () => <Text>🏠</Text> }} />
-        <Tab.Screen name="Density" component={DensityScreen} options={{ tabBarLabel: 'Density', tabBarIcon: () => <Text>⛽</Text> }} />
-        <Tab.Screen name="Converter" component={ConverterScreen} options={{ tabBarLabel: 'Convert', tabBarIcon: () => <Text>🔄</Text> }} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <SafeAreaProvider>
+    <SafeAreaView style={appStyles.root}>
+      <AppHeader title={current.title} onMenuPress={() => setDrawerOpen(true)} />
+      <View style={appStyles.content}>
+        {renderScreen()}
+      </View>
+      <CustomDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        activeScreen={activeScreen}
+        onNavigate={setActiveScreen}
+        menu={MENU}
+      />
+    </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
+
+const appStyles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: '#1a3a5c' },
+  content: { flex: 1, backgroundColor: '#f0f4f8' },
+});

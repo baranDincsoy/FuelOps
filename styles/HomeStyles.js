@@ -24,10 +24,12 @@ export default StyleSheet.create({
   unitBtnActive: { backgroundColor: '#1a3a5c' },
   unitBtnText: { fontSize: 14, color: '#1a3a5c', fontWeight: '600' },
   unitBtnTextActive: { color: '#fff' },
-  input: {
-    borderWidth: 1, borderColor: '#ddd', borderRadius: 8,
-    padding: 10, fontSize: 16, color: '#333', backgroundColor: '#fafafa',
-  },
+input: {
+  borderWidth: 1, borderColor: '#ddd', borderRadius: 8,
+  padding: 10, fontSize: 16,
+  color: '#1a3a5c',
+  backgroundColor: '#fafafa',
+},
   buttonRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
   btnCalc: {
     flex: 1, backgroundColor: '#1a3a5c',

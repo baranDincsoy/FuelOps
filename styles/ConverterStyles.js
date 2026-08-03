@@ -34,16 +34,16 @@ export default StyleSheet.create({
     color: '#555',
     marginBottom: 6,
   },
-  rowInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
-    color: '#1a3a5c',
-    fontWeight: '600',
-    backgroundColor: '#fafafa',
-  },
+rowInput: {
+  borderWidth: 1,
+  borderColor: '#ddd',
+  borderRadius: 8,
+  padding: 10,
+  fontSize: 16,
+  color: '#1a3a5c',
+  fontWeight: '600',
+  backgroundColor: '#fafafa',
+},
   divider: {
     height: 1,
     backgroundColor: '#e0e0e0',
@@ -55,4 +55,10 @@ export default StyleSheet.create({
     fontStyle: 'italic',
     marginBottom: 12,
   },
+  clearBtn: {
+    marginTop: 4, paddingVertical: 11, borderRadius: 8,
+    borderWidth: 1, borderColor: '#1a3a5c', alignItems: 'center',
+  },
+  clearBtnText: { color: '#1a3a5c', fontSize: 14, fontWeight: 'bold' },
+  warnText: { fontSize: 12, color: '#854F0B', marginBottom: 10 },
 });

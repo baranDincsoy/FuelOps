@@ -43,7 +43,7 @@ export default StyleSheet.create({
   fuelBtnTextActive: {
     color: '#fff',
   },
-
+  errorText: { color: '#c62828', fontSize: 12, marginTop: 10 },
   // Unit toggle
   unitToggleRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
   unitBtn: {
@@ -59,15 +59,15 @@ export default StyleSheet.create({
   unitBtnTextActive: { color: '#fff' },
 
   // Input
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
-    color: '#333',
-    backgroundColor: '#fafafa',
-  },
+input: {
+  borderWidth: 1,
+  borderColor: '#ddd',
+  borderRadius: 8,
+  padding: 10,
+  fontSize: 16,
+  color: '#1a3a5c',
+  backgroundColor: '#fafafa',
+},
 
   // Buttons
   buttonRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
@@ -88,6 +88,12 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderColor: '#1a3a5c',
   },
+  standardTag: {
+  fontSize: 11,
+  color: '#888',
+  marginTop: 6,
+  fontStyle: 'italic',
+},
   btnClearText: { color: '#1a3a5c', fontSize: 15, fontWeight: 'bold' },
 
   // Result
@@ -106,6 +112,15 @@ export default StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
   },
+  input: {
+  borderWidth: 1,
+  borderColor: '#ddd',
+  borderRadius: 8,
+  padding: 10,
+  fontSize: 16,
+  color: '#1a3a5c',      // ← input text rengi
+  backgroundColor: '#fafafa',
+},
   resultItem: {
     flex: 1,
     minWidth: '45%',
