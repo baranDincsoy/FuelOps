@@ -1,6 +1,14 @@
 // ASTM D1250 / Table 54B - Generalized Products (Refined)
 const TOLERANCE = 0.00001;
 const MAX_ITERATIONS = 20;
+// API convention: lb/gallon tables report weight in AIR, not in vacuum.
+// The buoyancy of displaced air is subtracted (0.0011 g/mL).
+const AIR_BUOYANCY = 1.1;          // kg/m³
+const KGM3_TO_LB_GAL = 0.0083454;  // 2.204623 lb / 264.172 gal
+
+export function densityToLbsPerGal(densityKgM3) {
+  return (densityKgM3 - AIR_BUOYANCY) * KGM3_TO_LB_GAL;
+}
 
 // Table 54B K constants by density range
 function getKConstants(density) {
@@ -177,14 +185,18 @@ export function correctApiGravity5B(observedApi, tempF) {
 
   const sg = density60 / 999.016;
   const correctedApi = (141.5 / sg) - 131.5;
+// Round API first, then derive everything from the displayed value
+  const roundedApi = Math.round(correctedApi * 10) / 10;
+  const displaySg = 141.5 / (roundedApi + 131.5);
+  const displayDensity = displaySg * 999.016;
 
   return {
-    correctedApi: Math.round(correctedApi * 10) / 10,
-    densityAt60F: Math.round(density60 * 10) / 10,
-    density15: Math.round(density60 * 10) / 10,
-    densityLbFt3: Math.round(density60 * 0.062428 * 1000) / 1000,
-    sg: Math.round(sg * 10000) / 10000,
-    lbsPerGal: Math.round(density60 * 0.008345 * 1000) / 1000,
+    correctedApi: roundedApi,
+    densityAt60F: Math.round(displayDensity * 10) / 10,
+    density15: Math.round(displayDensity * 10) / 10,
+    densityLbFt3: Math.round(displayDensity * 0.062428 * 1000) / 1000,
+    sg: Math.round(displaySg * 10000) / 10000,
+    lbsPerGal: Math.round(densityToLbsPerGal(displayDensity) * 1000) / 1000,
     vcf: Math.round(vcf * 10000) / 10000,
     iterations,
     standard: 'ASTM 5B/6B',
@@ -219,9 +231,9 @@ export function calculateMeterFactor(correctedApi, productTempF) {
   return {
     vcf: Math.round(vcf * 10000) / 10000,
     density60: Math.round(density60 * 10) / 10,
-    lbsPerGal60: Math.round(density60 * 0.008345 * 1000) / 1000,
+    lbsPerGal60: Math.round(densityToLbsPerGal(density60) * 1000) / 1000,
+    lbsPerGalAtTemp: Math.round(densityToLbsPerGal(densityAtTemp) * 1000) / 1000,
     densityAtTemp: Math.round(densityAtTemp * 10) / 10,
-    lbsPerGalAtTemp: Math.round(densityAtTemp * 0.008345 * 1000) / 1000,
     densityLbFt3AtTemp: Math.round(densityAtTemp * 0.062428 * 1000) / 1000,
     sgAtTemp: Math.round(sgAtTemp * 10000) / 10000,
     apiAtTemp: Math.round(apiAtTemp * 10) / 10,
@@ -262,7 +274,7 @@ export function calculateCompressibility(api60, tempF, pressurePsi = null) {
     cpl: cpl !== null ? Math.round(cpl * 100000) / 100000 : null,
     density60: Math.round(density60 * 10) / 10,
     sg60: Math.round(sg60 * 10000) / 10000,
-    lbsPerGal60: Math.round(density60 * 0.008345 * 1000) / 1000,
+    lbsPerGal60: Math.round(densityToLbsPerGal(density60) * 1000) / 1000,
     // what the paper table would give you after rounding to 0.5 steps
     roundedApi: Math.round(api60 * 2) / 2,
     roundedTemp: Math.round(tempF * 2) / 2,

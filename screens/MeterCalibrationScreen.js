@@ -2,9 +2,29 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useMeterCalibration } from '../hooks/useMeterCalibration';
 import styles from '../styles/MeterStyles';
+import { useSaveRecord } from '../hooks/useSaveRecord';
+
 
 export default function MeterCalibrationScreen() {
   const vm = useMeterCalibration();
+  const [tank, setTank] = React.useState('');
+  const saver = useSaveRecord();
+
+  function handleSave() {
+    saver.save({
+      type: 'meter',
+      tank: tank.trim(),
+      inputs: {
+        'Corrected API': vm.correctedApi,
+        'Temp': `${vm.productTemp}${vm.useFahrenheit ? '°F' : '°C'}`,
+      },
+      outputs: {
+        'VCF': vm.result.vcf,
+        'Lbs/Gal': vm.result.lbsPerGalAtTemp,
+        'API @ temp': `${vm.result.apiAtTemp}°`,
+      },
+    });
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -70,6 +90,22 @@ export default function MeterCalibrationScreen() {
             <Text style={styles.factorSub}>
               ΔT = {vm.result.deltaT > 0 ? '+' : ''}{vm.result.deltaT}°F from 60°F
             </Text>
+            <View style={styles.saveRow}>
+            <TextInput
+              style={styles.tankInput}
+              placeholderTextColor="#999"
+              placeholder="Cart / unit no. (optional)"
+              value={tank}
+              onChangeText={setTank}
+            />
+            <TouchableOpacity
+              style={[styles.btnSave, saver.saved && styles.btnSaved]}
+              onPress={handleSave}
+              disabled={saver.saving}
+            >
+              <Text style={styles.btnSaveText}>{saver.saved ? '✓ Saved' : 'Save'}</Text>
+            </TouchableOpacity>
+          </View>
           </View>
 
           <Text style={styles.sectionLabel}>At product temperature</Text>

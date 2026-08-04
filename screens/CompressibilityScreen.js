@@ -2,9 +2,31 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useCompressibility } from '../hooks/useCompressibility';
 import styles from '../styles/CompressibilityStyles';
+import { useSaveRecord } from '../hooks/useSaveRecord';
 
 export default function CompressibilityScreen() {
   const vm = useCompressibility();
+  const [tank, setTank] = React.useState('');
+  const saver = useSaveRecord();
+
+  function handleSave() {
+    const out = {
+      'Factor': vm.result.tableValue.toFixed(3),
+      'Lbs/Gal': vm.result.lbsPerGal60,
+    };
+    if (vm.result.cpl !== null) out['CPL'] = vm.result.cpl.toFixed(5);
+
+    saver.save({
+      type: 'compressibility',
+      tank: tank.trim(),
+      inputs: {
+        'API': vm.api,
+        'Temp': `${vm.temperature}°F`,
+        ...(vm.pressure.trim() ? { 'Pressure': `${vm.pressure} psi` } : {}),
+      },
+      outputs: out,
+    });
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -64,6 +86,22 @@ export default function CompressibilityScreen() {
             <Text style={styles.factorLabel}>Compressibility Factor</Text>
             <Text style={styles.factorValue}>{vm.result.tableValue.toFixed(3)}</Text>
             <Text style={styles.factorSub}>per psi, ×100000 (as printed in tables)</Text>
+                      <View style={styles.saveRow}>
+            <TextInput
+              style={styles.tankInput}
+              placeholderTextColor="#999"
+              placeholder="Cart / unit no. (optional)"
+              value={tank}
+              onChangeText={setTank}
+            />
+            <TouchableOpacity
+              style={[styles.btnSave, saver.saved && styles.btnSaved]}
+              onPress={handleSave}
+              disabled={saver.saving}
+            >
+              <Text style={styles.btnSaveText}>{saver.saved ? '✓ Saved' : 'Save'}</Text>
+            </TouchableOpacity>
+          </View>
           </View>
 
           {vm.result.cpl !== null && (

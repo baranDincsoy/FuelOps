@@ -57,4 +57,16 @@ export default StyleSheet.create({
   itemLabel: { fontSize: 12, color: '#888', marginBottom: 4 },
   itemValue: { fontSize: 16, fontWeight: 'bold', color: '#1a3a5c' },
   itemValueBig: { fontSize: 20, fontWeight: 'bold', color: '#1a3a5c' },
+  saveRow: { flexDirection: 'row', gap: 8, marginTop: 14, alignItems: 'center' },
+  tankInput: {
+    flex: 1, borderWidth: 1, borderColor: '#ddd', borderRadius: 8,
+    paddingHorizontal: 10, paddingVertical: 9, fontSize: 14,
+    color: '#1a3a5c', backgroundColor: '#fafafa',
+  },
+  btnSave: {
+    backgroundColor: '#1a3a5c', paddingVertical: 11,
+    paddingHorizontal: 22, borderRadius: 8,
+  },
+  btnSaved: { backgroundColor: '#3B6D11' },
+  btnSaveText: { color: '#fff', fontSize: 14, fontWeight: 'bold' },
 });

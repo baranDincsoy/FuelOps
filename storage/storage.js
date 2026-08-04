@@ -1,48 +1,65 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// TANKS
-export async function saveTank(tank) {
-  const tanks = await getTanks();
-  const existing = tanks.findIndex(t => t.id === tank.id);
-  if (existing >= 0) {
-    tanks[existing] = tank;
-  } else {
-    tanks.push(tank);
+const KEY = 'fuelops:records';
+const MAX_RECORDS = 200;
+
+/**
+ * A record is:
+ * {
+ *   id: string,
+ *   type: 'density' | 'meter' | 'compressibility',
+ *   createdAt: ISO string,
+ *   tank: string,          // free text, optional
+ *   note: string,          // free text, optional
+ *   inputs: {...},         // whatever the screen fed in
+ *   outputs: {...},        // the calculated values worth keeping
+ * }
+ */
+
+export async function getRecords() {
+  try {
+    const raw = await AsyncStorage.getItem(KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.warn('getRecords failed', e);
+    return [];
   }
-  await AsyncStorage.setItem('tanks', JSON.stringify(tanks));
 }
 
-export async function getTanks() {
-  const data = await AsyncStorage.getItem('tanks');
-  return data ? JSON.parse(data) : [];
+export async function saveRecord(record) {
+  try {
+    const records = await getRecords();
+    const withId = {
+      ...record,
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      createdAt: new Date().toISOString(),
+    };
+    const next = [withId, ...records].slice(0, MAX_RECORDS);
+    await AsyncStorage.setItem(KEY, JSON.stringify(next));
+    return withId;
+  } catch (e) {
+    console.warn('saveRecord failed', e);
+    return null;
+  }
 }
 
-export async function deleteTank(id) {
-  const tanks = await getTanks();
-  const filtered = tanks.filter(t => t.id !== id);
-  await AsyncStorage.setItem('tanks', JSON.stringify(filtered));
+export async function deleteRecord(id) {
+  try {
+    const records = await getRecords();
+    await AsyncStorage.setItem(KEY, JSON.stringify(records.filter(r => r.id !== id)));
+    return true;
+  } catch (e) {
+    console.warn('deleteRecord failed', e);
+    return false;
+  }
 }
 
-// SOUNDING RECORDS
-export async function saveSoundingRecord(record) {
-  const records = await getSoundingRecords();
-  records.unshift(record);
-  await AsyncStorage.setItem('soundingRecords', JSON.stringify(records));
-}
-
-export async function getSoundingRecords() {
-  const data = await AsyncStorage.getItem('soundingRecords');
-  return data ? JSON.parse(data) : [];
-}
-
-// DENSITY RECORDS
-export async function saveDensityRecord(record) {
-  const records = await getDensityRecords();
-  records.unshift(record);
-  await AsyncStorage.setItem('densityRecords', JSON.stringify(records));
-}
-
-export async function getDensityRecords() {
-  const data = await AsyncStorage.getItem('densityRecords');
-  return data ? JSON.parse(data) : [];
+export async function clearRecords() {
+  try {
+    await AsyncStorage.removeItem(KEY);
+    return true;
+  } catch (e) {
+    console.warn('clearRecords failed', e);
+    return false;
+  }
 }

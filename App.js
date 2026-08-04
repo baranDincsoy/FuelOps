@@ -9,12 +9,14 @@ import CustomDrawer from './components/CustomDrawer';
 import AppHeader from './components/AppHeader';
 import CompressibilityScreen from './screens/CompressibilityScreen';
 import MeterCalibrationScreen from './screens/MeterCalibrationScreen';
+import HistoryScreen from './screens/HistoryScreen';
 
 const MENU = [
   { key: 'Compress',  label: 'Compressibility', icon: '📊', title: 'Compressibility Factor' },
   { key: 'Density',   label: 'API Gravity',     icon: '⛽', title: 'API Gravity' },
   { key: 'Meter',     label: 'Meter Factor',    icon: '📐', title: 'Meter Calibration' },
   { key: 'Converter', label: 'Unit Converter',  icon: '🔄', title: 'Unit Converter' },
+  { key: 'History',   label: 'Saved Records',   icon: '📋', title: 'Saved Records' },
 ];
 
 export default function App() {
@@ -25,15 +27,14 @@ const [activeScreen, setActiveScreen] = useState('Compress');
 
   function renderScreen() {
     switch (activeScreen) {
-      case 'Home':      return <HomeScreen />;
-      case 'Density':   return <DensityScreen />;
       case 'Compress':  return <CompressibilityScreen />;
-      case 'Converter': return <ConverterScreen />;
+      case 'Density':   return <DensityScreen />;
       case 'Meter':     return <MeterCalibrationScreen />;
-      default:          return <HomeScreen />;
+      case 'Converter': return <ConverterScreen />;
+      case 'History':   return <HistoryScreen />;
+      default:          return <CompressibilityScreen />;
     }
   }
-
   return (
     <SafeAreaProvider>
     <SafeAreaView style={appStyles.root}>

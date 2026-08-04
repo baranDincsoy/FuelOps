@@ -3,10 +3,31 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-nativ
 import { useDensityCalculator } from '../hooks/useDensityCalculator';
 import { detectFuelType } from '../utils/densityCalc';
 import styles from '../styles/DensityStyles';
+import { useSaveRecord } from '../hooks/useSaveRecord';
 
 export default function DensityScreen() {
   const vm = useDensityCalculator();
   const r = vm.result;
+
+  const [tank, setTank] = React.useState('');
+  const saver = useSaveRecord();
+
+  function handleSave() {
+    saver.save({
+      type: 'density',
+      tank: tank.trim(),
+      inputs: {
+        'Raw API': vm.observedApi,
+        'Temp': `${vm.temperature}${vm.useFahrenheit ? '°F' : '°C'}`,
+      },
+      outputs: {
+        'Corrected API': `${r.correctedApi}°`,
+        'SG': r.sg,
+        'Lbs/Gal': vm.useTable5B ? r.lbsPerGal : '—',
+      },
+      note: vm.useTable5B ? 'ASTM 5B/6B' : 'ASTM 54B',
+    });
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -95,6 +116,24 @@ export default function DensityScreen() {
             <Text style={styles.standardTag}>
               Standard: {vm.useTable5B ? 'ASTM 5B/6B (US)' : 'ASTM 54B (Metric)'}
             </Text>
+            <View style={styles.saveRow}>
+            <TextInput
+              style={styles.tankInput}
+              placeholderTextColor="#999"
+              placeholder="Tank / unit no. (optional)"
+              value={tank}
+              onChangeText={setTank}
+            />
+            <TouchableOpacity
+              style={[styles.btnSave, saver.saved && styles.btnSaved]}
+              onPress={handleSave}
+              disabled={saver.saving}
+            >
+              <Text style={styles.btnSaveText}>
+                {saver.saved ? '✓ Saved' : 'Save'}
+              </Text>
+            </TouchableOpacity>
+          </View>
           </View>
 
           <View style={styles.resultGrid}>
