@@ -1,97 +1,128 @@
-
 # FuelOps ⚓
 
 ![Language](https://img.shields.io/badge/Language-JavaScript-yellow) ![Framework](https://img.shields.io/badge/Framework-React%20Native-blue) ![Platform](https://img.shields.io/badge/Platform-Android-green) ![Standard](https://img.shields.io/badge/Standard-ASTM%20D1250-orange)
 
-A cross-platform mobile fuel calculation tool built for aviation, marine, and tank farm operators. Built with **React Native** and **Expo**, this project replaces the analog Gammon GTP-3012-1A API gravity wheel chart with a digital, standards-compliant calculator used industry-wide.
+A mobile fuel calculation tool for aviation, marine, and tank farm operators. Built with **React Native** and **Expo**, it replaces the analog Gammon GTP-3012-1A API gravity wheel and the printed compressibility tables still used daily in fuel operations.
 
 ---
 
 ## 📱 App Screenshots
 
-| Home (VCF) | Density (API) | Converter | Quantity |
-|:---:|:---:|:---:|:---:|
-|:---:|:---:|:---:|:---:|
-| <img width="403" height="853" alt="home png" src="https://github.com/user-attachments/assets/cfecdc92-8ecd-4948-80a8-09e4b1c753de" /> | <img width="378" height="833" alt="density png" src="https://github.com/user-attachments/assets/a3049bf3-0426-44c9-99b0-d0d21c12642e" /> | <img width="392" height="852" alt="converter1 png" src="https://github.com/user-attachments/assets/3d102a06-051a-4d9f-aa6c-24c724f4fe80" /> | <img width="389" height="854" alt="converter2 png" src="https://github.com/user-attachments/assets/a4467539-dc46-4f86-a4c1-005f9836cd13" /> | <img width="408" height="852" alt="converter3 png" src="https://github.com/user-attachments/assets/9ea49fa4-27b7-4e9d-bceb-2792f8a7a44a" /> | <img width="390" height="847" alt="converter4 png" src="https://github.com/user-attachments/assets/dc2d7dc5-e8db-4f14-98e6-df5117151cbc" /> |<img width="397" height="832" alt="quantity png" src="https://github.com/user-attachments/assets/ac06b7b0-fef8-4f36-8ee5-78c5bb303fec" />
-
-
-
-
+*(screenshots to be updated)*
 
 ---
 
-## 🌟 Beyond a Generic Calculator (Real Industry Math)
+## 🎯 Field Validation
 
-While most fuel calculator apps use hardcoded shortcuts, **I implemented the full ASTM D1250 Table 54B standard** the way petroleum engineers actually use it in custody-transfer operations:
+This is the part that matters most. The calculations were verified against the physical instruments and printed tables used in daily airport fuel operations — not just against textbook formulas.
 
-* **Iterative Convergence Loop:** Resolves the "chicken-and-egg" problem between observed and standard density. Most calculator apps skip this and lose accuracy on hot pipelines.
-* **Dynamic K₀/K₁ Constants:** Selects the correct thermal expansion coefficients per fuel class (Gasolines, Jet Fuels, Diesels) inside the iteration — not hardcoded averages.
-* **Physical Correctness:** Early versions had a sign bug (API moved the wrong direction with temperature). Debugging this taught me that in engineering software, fluid physics is the unit test.
-* **Auto Fuel Detection:** Identifies the fuel type from corrected API range — JET A, AVGAS, MOGAS, Marine Diesel, etc.
-* **Bilingual Units:** Full °C/°F and metric/imperial parity. A tank farm in Houston and a refinery in Rotterdam use the same app.
+| Raw API | Temp | Wheel | FuelOps |
+|:---:|:---:|:---:|:---:|
+| 44.5 | 76°F | 43.1 | 43.1 |
+| 45.5 | 83°F | 43.5 | 43.5 |
+| 47.0 | 97°F | 43.7 | 43.7 |
+| 45.5 | 86°F | 43.2 | 43.2 |
+| 45.3 | 84°F | 43.2 | 43.2 |
+| 45.5 | 89°F | 43.0 | 43.0 |
+
+Reference sources: Gammon GTP-3012-1A API gravity wheel, ATA Form 103.08 fuel quality records, and printed compressibility factor tables.
+
+**Two corrections were only discovered through field testing** — no textbook would have flagged them:
+
+* **Hydrometer glass expansion (HYC).** Early results drifted low, and the drift grew with ΔT. The glass of the hydrometer itself expands with temperature; API 11.1 corrects for this. Adding it closed the gap across the full temperature range.
+* **Weight in air vs. weight in vacuum.** Metric density is defined in vacuum, but the API lb/gallon tables report weight in air. Subtracting air buoyancy (0.0011 g/mL) brought lb/gal into agreement with the field records — a 0.009 lb/gal difference that would otherwise look like a bug to any operator checking the app against their chart.
+
+A third detail came from the same testing: displayed values are now derived from the **rounded** corrected API rather than the internal high-precision value. The difference is 0.001 in specific gravity — invisible to the physics, but it means every number on screen agrees with every other number, and with the operator's wheel.
 
 ---
 
-## 🛠 Tech Stack & Libraries
+## 🌟 What It Does
 
-* **Language:** JavaScript (ES6+)
-* **Framework:** React Native with Expo SDK 54
-* **Navigation:** React Navigation (Bottom Tabs)
-* **State Management:** React Hooks (`useState`)
-* **Storage:** AsyncStorage
-* **Build:** EAS Build (Cloud Android APK)
+### Compressibility Factor
+Replaces the printed *Compressibility Factors per PSI* tables used in fuel cart and meter calibration. Implements API MPMS Chapter 11.2.1 directly, so it works at any input rather than the 0.5-step grid the paper tables are limited to — and covers the full 0–90° API range instead of the narrow band a printed page can fit.
+
+### API Gravity Correction
+The digital equivalent of the Gammon wheel: observed API + fuel temperature → corrected API at 60°F, with density, specific gravity, and lb/gallon alongside. Switchable between **ASTM 5B/6B** (US, 60°F reference) and **ASTM 54B** (metric, 15°C reference).
+
+### Meter Calibration Factor
+The inverse operation, for calibration technicians: corrected API + product temperature → the correction factor, plus density and lb/gallon at that temperature.
+
+### Unit Converter
+Volume (L, m³, US gal, bbl), weight (kg, tons, lbs, long tons), temperature (°C, °F, K), length (cm, in, mm, m, ft), and a density-bridged quantity converter for volume ↔ mass.
+
+### Saved Records
+Calculations can be tagged with a tank or cart number and stored on-device, so field readings survive until they reach the paper form.
+
+---
+
+## 🔬 The Math
+
+Most fuel calculator apps take shortcuts. This one implements the standard as written:
+
+* **Iterative convergence.** Standard density is needed to find the thermal expansion coefficient, but the coefficient is needed to find standard density. ASTM resolves this with iteration to a tolerance, not a single pass.
+* **Dynamic K₀/K₁ constants.** The coefficients are selected per fuel class (gasolines, transition, jet fuels/kerosene, diesels) *inside* the loop, so a density that crosses a boundary during convergence lands on the right constants.
+* **True 6B constants for the US standard.** The 60°F-referenced constants are the 15°C ones scaled by 5/9, since 1°F = 5/9 °C. An earlier version used an empirical fudge factor to bridge the two references; it fit the data but wasn't defensible. It's gone.
+* **Automatic fuel type detection** from the corrected API range.
 
 ---
 
 ## 🏗 Architecture
 
-The app follows a **separation-of-concerns** pattern for maintainability and testing:
+The app follows an MVVM-equivalent separation, adapted to React Native's idioms:
 
-1. **`/utils`:** Pure calculation modules (`densityCalc.js`) — no UI, no state, just math. Easy to unit test.
-2. **`/screens`:** UI composition only — each screen wires inputs to utility functions.
-3. **`/styles`:** Dedicated StyleSheet modules per screen — no inline styles cluttering the JSX.
-4. **`/storage`:** AsyncStorage wrappers for future persistence features.
+| Layer | Location | Responsibility |
+|---|---|---|
+| **Model** | `/utils`, `/storage` | Pure functions and persistence. No state, no UI. |
+| **ViewModel** | `/hooks` | State, input parsing, validation, orchestration. Custom hooks stand in for ViewModels. |
+| **View** | `/screens`, `/components` | JSX only. No business logic. |
+| **Styling** | `/styles` | One StyleSheet module per screen. |
 
-This separation made debugging the iterative density algorithm straightforward — when the math broke, I knew exactly which file to open.
+The unit converter shows why this pays off: volume, weight, and length all run through a single `useUnitConverter` hook driven by a unit table — adding a new category means adding a table, not a screen.
 
----
-
-## 🚀 How to Run
-
-1. Clone this repository:
-```bash
-   git clone https://github.com/baranDincsoy/FuelOps.git
-```
-2. Install dependencies:
-```bash
-   cd FuelOps
-   npm install
-```
-3. Start the development server:
-```bash
-   npx expo start
-```
-4. Scan the QR code with **Expo Go** on your Android device, or press `a` to launch an emulator.
+Navigation is a custom drawer built on React Native's own `Animated` API. `react-native-reanimated` kept colliding with the new Android architecture through TurboModule errors, so the dependency was dropped entirely in favour of ~80 lines of first-party code.
 
 ---
 
-## 🔮 Future Improvements
+## 🛠 Tech Stack
 
-* **Tank Calibration Module:** Sounding → Volume → Mass with trim correction (currently shelved due to user-input overhead in field conditions).
-* **Consumption Tracking:** Persistent daily measurements for fuel consumption analysis.
-* **PDF Reports:** Export shift summaries for handover.
-* **Cloud Sync:** Multi-device sync for fleet operations.
-* **iOS Build:** Currently Android-only; iOS support pending Apple Developer enrollment.
+* **Language:** JavaScript (ES6+)
+* **Framework:** React Native, Expo SDK 54
+* **Navigation:** Custom drawer (no third-party navigation dependency)
+* **State:** React Hooks
+* **Storage:** AsyncStorage
+* **Build:** EAS Build (cloud Android APK)
+
+---
+
+
+## 🔮 Roadmap
+
+* **Fuel spec limits reference** — density, flash point, and freeze point limits per ASTM D1655, D975, D4814.
+* **Wider validation** — current field data covers 44–47° API (jet fuel). Diesel and AVGAS bands are untested against physical instruments.
+* **PDF export** for shift handover.
+* **iOS build** — Android-only for now, pending Apple Developer enrollment.
 
 ---
 
 ## 💡 Why I Built This
 
-I'm a tank farm mechanic transitioning into software engineering. Every shift, I watched operators reach for the analog Gammon API gravity wheel chart — a tool unchanged for decades. There was no good digital alternative built by someone who actually understood the operations.
+I'm a tank farm mechanic transitioning into software engineering. Every shift, operators reach for a plastic wheel chart and a photocopied table — tools unchanged for decades. There was no good digital alternative built by someone who actually understood the operations.
 
 So I built one.
 
-This app sits at the intersection of my two careers: industrial fuel operations and clean software engineering. The physics came from years on tankers and tank farms. The code came from 43 weeks of self-study.
+The most useful thing I learned wasn't a framework. It was that in engineering software, the physics is the test suite. Twice the code ran cleanly, looked right, and was wrong — and both times the tell was a number that felt off to someone who'd stood next to the hydrometer. Domain knowledge caught what unit tests wouldn't have.
+
+---
+
+## ⚠️ Disclaimer
+
+Calculations are provided as an engineering aid. They must not be used as the sole basis for custody transfer, billing, or safety-critical decisions.
+
+---
+
+## 📄 License
+
+See [LICENSE](LICENSE). Published for portfolio review; not licensed for redistribution.
 
 ---
 
