@@ -8,7 +8,11 @@ A mobile fuel calculation tool for aviation, marine, and tank farm operators. Bu
 
 ## 📱 App Screenshots
 
-*(screenshots to be updated)*
+<img width="480" height="1016" alt="Ekran görüntüsü 2026-08-05 172413" src="https://github.com/user-attachments/assets/cce1b2ae-fff2-43e7-8077-a02bbe18e9b1" /> <img width="475" height="995" alt="Ekran görüntüsü 2026-08-05 172442" src="https://github.com/user-attachments/assets/306befc9-b190-4f37-9c52-c4c373248566" /> <img width="472" height="1003" alt="Ekran görüntüsü 2026-08-05 172558" src="https://github.com/user-attachments/assets/8fd8fa53-4730-4604-822c-a57707ddf8e4" />
+<img width="474" height="1009" alt="Ekran görüntüsü 2026-08-05 172548" src="https://github.com/user-attachments/assets/f482843e-18ee-40e5-a1ee-0acd673ed56d" /> <img width="463" height="998" alt="Ekran görüntüsü 2026-08-05 172536" src="https://github.com/user-attachments/assets/857f82fa-4395-418a-a55c-80a6bb40fc98" /> 
+
+
+
 
 ---
 
