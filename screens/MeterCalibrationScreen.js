@@ -5,15 +5,16 @@ import styles from '../styles/MeterStyles';
 import { useSaveRecord } from '../hooks/useSaveRecord';
 
 
+
 export default function MeterCalibrationScreen() {
   const vm = useMeterCalibration();
-  const [tank, setTank] = React.useState('');
+  const [unit, setUnit] = React.useState('');
   const saver = useSaveRecord();
 
   function handleSave() {
     saver.save({
       type: 'meter',
-      tank: tank.trim(),
+      tank: unit.trim(),
       inputs: {
         'Corrected API': vm.correctedApi,
         'Temp': `${vm.productTemp}${vm.useFahrenheit ? '°F' : '°C'}`,
@@ -90,22 +91,6 @@ export default function MeterCalibrationScreen() {
             <Text style={styles.factorSub}>
               ΔT = {vm.result.deltaT > 0 ? '+' : ''}{vm.result.deltaT}°F from 60°F
             </Text>
-            <View style={styles.saveRow}>
-            <TextInput
-              style={styles.tankInput}
-              placeholderTextColor="#999"
-              placeholder="Cart / unit no. (optional)"
-              value={tank}
-              onChangeText={setTank}
-            />
-            <TouchableOpacity
-              style={[styles.btnSave, saver.saved && styles.btnSaved]}
-              onPress={handleSave}
-              disabled={saver.saving}
-            >
-              <Text style={styles.btnSaveText}>{saver.saved ? '✓ Saved' : 'Save'}</Text>
-            </TouchableOpacity>
-          </View>
           </View>
 
           <Text style={styles.sectionLabel}>At product temperature</Text>
@@ -138,6 +123,22 @@ export default function MeterCalibrationScreen() {
               <Text style={styles.itemLabel}>Density</Text>
               <Text style={styles.itemValue}>{vm.result.density60} kg/m3</Text>
             </View>
+          </View>
+          <View style={styles.saveRow}>
+            <TextInput
+              style={styles.tankInput}
+              placeholderTextColor="#999"
+              placeholder="Cart / meter no. (optional)"
+              value={unit}
+              onChangeText={setUnit}
+            />
+            <TouchableOpacity
+              style={[styles.btnSave, saver.saved && styles.btnSaved]}
+              onPress={handleSave}
+              disabled={saver.saving}
+            >
+              <Text style={styles.btnSaveText}>{saver.saved ? '✓ Saved' : 'Save'}</Text>
+            </TouchableOpacity>
           </View>
         </View>
       )}

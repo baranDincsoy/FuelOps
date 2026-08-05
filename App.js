@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Platform, StatusBar } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-import HomeScreen from './screens/HomeScreen';
 import DensityScreen from './screens/DensityScreen';
 import ConverterScreen from './screens/ConverterScreen';
 import CustomDrawer from './components/CustomDrawer';
@@ -33,6 +32,7 @@ const [activeScreen, setActiveScreen] = useState('Compress');
       case 'Converter': return <ConverterScreen />;
       case 'History':   return <HistoryScreen />;
       default:          return <CompressibilityScreen />;
+       case 'History':   return <HistoryScreen key={Date.now()} />;
     }
   }
   return (

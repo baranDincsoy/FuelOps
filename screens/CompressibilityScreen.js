@@ -6,26 +6,27 @@ import { useSaveRecord } from '../hooks/useSaveRecord';
 
 export default function CompressibilityScreen() {
   const vm = useCompressibility();
-  const [tank, setTank] = React.useState('');
+  const [unit, setUnit] = React.useState('');
   const saver = useSaveRecord();
 
   function handleSave() {
-    const out = {
+    const outputs = {
       'Factor': vm.result.tableValue.toFixed(3),
       'Lbs/Gal': vm.result.lbsPerGal60,
     };
-    if (vm.result.cpl !== null) out['CPL'] = vm.result.cpl.toFixed(5);
+    if (vm.result.cpl !== null) {
+      outputs['CPL'] = vm.result.cpl.toFixed(5);
+    }
 
-    saver.save({
-      type: 'compressibility',
-      tank: tank.trim(),
-      inputs: {
-        'API': vm.api,
-        'Temp': `${vm.temperature}°F`,
-        ...(vm.pressure.trim() ? { 'Pressure': `${vm.pressure} psi` } : {}),
-      },
-      outputs: out,
-    });
+    const inputs = {
+      'API': vm.api,
+      'Temp': `${vm.temperature}°F`,
+    };
+    if (vm.pressure.trim()) {
+      inputs['Pressure'] = `${vm.pressure} psi`;
+    }
+
+    saver.save({ type: 'compressibility', tank: unit.trim(), inputs, outputs });
   }
 
   return (
@@ -86,22 +87,7 @@ export default function CompressibilityScreen() {
             <Text style={styles.factorLabel}>Compressibility Factor</Text>
             <Text style={styles.factorValue}>{vm.result.tableValue.toFixed(3)}</Text>
             <Text style={styles.factorSub}>per psi, ×100000 (as printed in tables)</Text>
-                      <View style={styles.saveRow}>
-            <TextInput
-              style={styles.tankInput}
-              placeholderTextColor="#999"
-              placeholder="Cart / unit no. (optional)"
-              value={tank}
-              onChangeText={setTank}
-            />
-            <TouchableOpacity
-              style={[styles.btnSave, saver.saved && styles.btnSaved]}
-              onPress={handleSave}
-              disabled={saver.saving}
-            >
-              <Text style={styles.btnSaveText}>{saver.saved ? '✓ Saved' : 'Save'}</Text>
-            </TouchableOpacity>
-          </View>
+
           </View>
 
           {vm.result.cpl !== null && (
@@ -132,7 +118,22 @@ export default function CompressibilityScreen() {
               </Text>
             </View>
           </View>
-
+              <View style={styles.saveRow}>
+            <TextInput
+              style={styles.tankInput}
+              placeholderTextColor="#999"
+              placeholder="Cart / meter no. (optional)"
+              value={unit}
+              onChangeText={setUnit}
+            />
+            <TouchableOpacity
+              style={[styles.btnSave, saver.saved && styles.btnSaved]}
+              onPress={handleSave}
+              disabled={saver.saving}
+            >
+              <Text style={styles.btnSaveText}>{saver.saved ? '✓ Saved' : 'Save'}</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.noteText}>
             Printed tables step in 0.5 increments — this result is calculated at
             your exact input, so no rounding is needed.
